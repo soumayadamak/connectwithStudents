@@ -76,3 +76,10 @@ nav button:hover, button:focus, nav a:hover, nav a:focus {
     background-color: var(--color-focus);
 }
 
+
+/* create account page  */
+.required:after {
+content:" *";
+color: red;
+}
+

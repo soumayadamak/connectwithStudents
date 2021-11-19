@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block nav %}
+<h1> Create Account</h1>
+{% endblock %}
+{% block main_content %}
+<form method="post" action="{{url_for('create')}}"></form>
+    <p><label class = "required" >Email: <input required type="email" name="email"></label></p>
+    <p><label class = "required" >Password: <input required type="text" name="password1"></label></p>
+    <p><label class = "required" >Confirm Password: <input required type="text" name="password2"></label></p>
+    <p><label class = "required" >Name: <input required type="text" name="name"></label></p>
+    <p><label class = "required" >Year Group:
+        <select required name="year">
+            <option value="">choose</option>
+            {% for year in info.year %}
+            <option value="{{year}}">{{year}}</option>
+            {% endfor %}
+        </select>
+    </label></p>
+    <p><label class = "required">Looking for a mentee(little)?
+        <input required type="radio" name="mentor" value="yes"> Yes </input>
+        <input required type="radio" name="mentor" value="no"> No </input>
+    </label></p>
+    <p><label class = "required">Looking for a mentor(big)?
+        <input required type="radio" name="mentee" value="yes"> Yes </input>
+        <input required type="radio" name="mentee" value="no"> No </input>
+    </label></p>
+
+
+    <p><input type="submit" value="Create Account">
+</form>
+
+{% endblock %}
