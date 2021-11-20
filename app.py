@@ -2,7 +2,7 @@ from flask import (Flask, render_template, make_response, url_for, request,
                    redirect, flash, session, send_from_directory, jsonify)
 from werkzeug.utils import secure_filename
 app = Flask(__name__)
-
+#just for main
 import bcrypt
 import cs304dbi as dbi
 # import cs304dbi_sqlite3 as dbi
