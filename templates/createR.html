@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block nav %}
+<h1> Create Account</h1>
+{% endblock %}
+{% block main_content %}
+<form id = 'joinform' method="post" action="{{url_for('create')}}" >
+    <p><label class = "required" >Email: <input required type="email" name="email"></label></p>
+    <p><label class = "required" >Password: <input required type="text" name="password1"></label></p>
+    <p><label class = "required" >Confirm Password: <input required type="text" name="password2"></label></p>
+    <p><label class = "required" >Name: <input required type="text" name="name"></label></p>
+    <p><label class = "required" >Year Group:
+        <select required name="year">
+            <option value="">choose</option>
+            {% for year in info.year %}
+            <option value="{{year}}">{{year}}</option>
+            {% endfor %}
+        </select>
+    </label></p>
+    <p><label class = "required">Looking for a mentee(little)?
+        <input required type="radio" name="mentor" value="yes"> Yes </input>
+        <input required type="radio" name="mentor" value="no"> No </input>
+    </label></p>
+    <p><label class = "required">Looking for a mentor(big)?
+        <input required type="radio" name="mentee" value="yes"> Yes </input>
+        <input required type="radio" name="mentee" value="no"> No </input>
+    </label></p>
+    <p><input type="submit" name = "submit" value="Next">
+</form>
+{% endblock %}
+{% block end_scripts %}
+
+<script>
+    $("#joinform").on('submit', function (event) {
+         var pw1 = $(this).find('[name=password1]').val();
+         var pw2 = $(this).find('[name=password2]').val();
+         // should also check for length and common words etc
+         if( pw1 != pw2 ) {
+             // something more sophisticated than alert would be nice
+             event.preventDefault();
+             alert("passwords don't match");
+         }else{
+             return true;
+         }
+    });
+    </script>
+{% endblock %}

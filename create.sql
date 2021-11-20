@@ -5,7 +5,7 @@ drop table if exists inClub;
 drop table if exists hasMajor;
 drop table if exists student;
 drop table if exists hobby;
-drop table is exists country;
+drop table if exists country;
 drop table if exists club;
 drop table if exists major;
  
@@ -35,6 +35,8 @@ create table student(
    index(email),
    password char(60) not null,
    profile varchar(1024),
+   mentor  varchar(3),
+   mentee bit,
    class SET("2022","2023","2024","2025") not null,
    race SET("Native American/Alaska Native", "Black/African American", "White/non Hispanic","Asian","Middle Eastern/North African","Hispanic/Latinx","Pacific Islander","Not Listed"),
    firstGen set("First Generation", "Low Income Background"),
@@ -42,7 +44,8 @@ create table student(
    personality set("INTJ", "INTP","ENTJ","ENTP","INFJ","INFP","ENFJ","ENFP","ISTJ","ISFJ","ESTJ","ESFJ","ISTP","ISFP","ESTP","ESFP"),
    immigration set("International Student", "Refugee","My Family immigrated to the US", "US citizen but lived abroad","Dual Citizen of the US and another country"),
    city set("Alaska", "Alabama", "Arkansas", "American Samoa", "Arizona", "California", "Colorado", "Connecticut", "District ", "of Columbia", "Delaware", "Florida", "Georgia", "Guam", "Hawaii", "Iowa", "Idaho", "Illinois", "Indiana", "Kansas", "Kentucky", "Louisiana", "Massachusetts", "Maryland", "Maine", "Michigan", "Minnesota", "Missouri", "Mississippi", "Montana", "North Carolina", "North Dakota", "Nebraska", "New Hampshire", "New Jersey", "New Mexico", "Nevada", "New York", "Ohio", "Oklahoma", "Oregon", "Pennsylvania", "Puerto Rico", "Rhode Island", "South Carolina", "South Dakota", "Tennessee", "Texas", "Utah", "Virginia", "Virgin Islands", "Vermont", "Washington", "Wisconsin", "West Virginia", "Wyoming"),
-   bio varchar(250) not null          
+   bio varchar(250) not null,
+   career set("Architecture", "Engineering","Arts", "Entertainment","Business", "Finance", "Consulting","Communications","Community and social services","Education","Science and technology","Government", "Non-profit","Health and medicine"," Law and public policy","Sales")       
 )
  
 ENGINE = innoDB;

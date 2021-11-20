@@ -83,3 +83,6 @@ content:" *";
 color: red;
 }
 
+.default {
+    display: none;
+}
