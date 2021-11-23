@@ -25,6 +25,14 @@ app.config['TRAP_BAD_REQUEST_ERRORS'] = True
 app.config['UPLOADS'] = 'uploads'
 app.config['MAX_CONTENT_LENGTH'] = 1 * 1024 * 1024
 
+@app.route('/',methods=['GET','POST'])
+def index():
+    if request.method == "GET":
+        return render_template("base.html", info = globalVars.info)
+    else:
+        info = request.form
+        flash(list(info.getlist("major")))
+        return render_template("base.html", info = globalVars.info)
 # create account with required info only initially, the password check happens in the front end, will check the email there too
 # when post and submit value is next , the user is added, a new session is created with user's id, email and logged in recorded 
 # it then shows the second form of the non required information which will be handeled by same function but will just update 
@@ -60,50 +68,77 @@ def create():
             session['uid'] = uid
             session['logged_in'] = True
             session['visits'] = 1
-            return render_template( "create.html", info = globalVars.info)
+            return render_template( "createN.html", info = globalVars.info)
         else: 
             try:
                 nm = session['uid']
-                print(info)
                 columns = ["race","firstGen","spiritual","personality","immigration","city","bio","career"]
                 final = []
                 for col in columns:
-                    final.append(info[col])
+                    final.append(info.get(col,"NULL"))
                     print(final)
                 final.append(nm)
                 curs.execute(''' update student set race = %s, firstGen = %s, spiritual = %s,
                  personality = %s, immigration = %s, city = %s, bio = %s, career = %s where nm = %s''',final)
                 conn.commit()
-
-                if len(info["hobby"]) != 0:
-                    student.processHobby()
-                if info["country"] != "NULL":
-                    #process country 
-                if info["org"] != "NULL":
-                    #process org 
-                if info["major"] != "NULL":
-                    #process major
+                hobbies = info["hobby"].strip().lower()
+                if len(hobbies) != 0:
+                    hobbies = hobbies.split(',')
+                    for hobby in hobbies:
+                        curs.execute(''' select hb from country where name LIKE %s''', ['%'+hobby+'%'])
+                        c = curs.fetchall()[0]
+                        if len(c) == 0 :
+                            curs.execute(''' insert into hobby(name) values (%s,%s)''',[c])
+                            conn.commit()
+                            curs.execute('select last_insert_id()')
+                            c = curs.fetchone()
+                            c = row[0]
+                        curs.execute(''' insert into hasHobby(nm,hb) values (%s,%s)''',[nm,c])
+                        conn.commit()
+                        
+                country = list(info.getlist("country"))
+                org =list( info.getlist("org"))
+                major = list(info.getlist("major"))
+                if len(country) != 0:
+                    for coun in country:
+                        curs.execute(''' select cid from country where name LIKE %s''', ['%'+coun+'%'])
+                        c = curs.fetchall()[0]["cid"]
+                        curs.execute(''' insert into fromCountry(nm,cid) values (%s,%s)''',[nm,c])
+                        conn.commit()
+                    
+                if len(org) != 0:
+                    for orga in org: 
+                        curs.execute(''' select clid from club where clubName LIKE %s''', ['%'+orga+'%'])
+                        c = curs.fetchall()[0]["clid"]
+                        curs.execute(''' insert into inClub(nm,clid) values (%s,%s)''',[nm,c])
+                        conn.commit()
+                if len(major) != 0:
+                    for maj in major:
+                        curs.execute(''' select mid from major where majorName LIKE %s''', ['%'+maj+'%'])
+                        c = curs.fetchall()[0]["mid"]
+                        curs.execute(''' insert into hasMajor(nm,mid) values (%s,%s)''',[nm,c])
+                        conn.commit()
 
                 allowed = {'jpg','gif','png'}
                 #process image
-                f = request.files['pic']
-                user_filename = f.filename
-                ext = user_filename.split('.')[-1]
-                if ext not in allowed:
-                    flash('extension not allowed, it needs to be jpg, gif, or png')
-                    return render_template(create.html, info = globalVars.info)
-                else:
-                    filename = secure_filename('{}.{}'.format(nm,ext))
-                    pathname = os.path.join(app.config['UPLOADS'],filename)
-                    f.save(pathname)
-                    curs.execute(''' update student set profile = %s ''',[filename])
-                    conn.commit()
-                #change the return here to redirect to user url?
-                return render_template("base.html")
+                if 'pic' in request.files: 
+                    f = request.files['pic']
+                    user_filename = f.filename
+                    ext = user_filename.split('.')[-1]
+                    if ext not in allowed:
+                        flash('extension not allowed, it needs to be jpg, gif, or png')
+                        return render_template(create.html, info = globalVars.info)
+                    else:
+                        filename = secure_filename('{}.{}'.format(nm,ext))
+                        pathname = os.path.join(app.config['UPLOADS'],filename)
+                        f.save(pathname)
+                        curs.execute(''' update student set profile = %s ''',[filename])
+                        conn.commit()
+                return redirect(url_for('/'))
 
             except Exception as err:
-                flash('Upload failed because {why}'.format(err))
-                return render_template(create.html, info = globalVars.info)
+                flash('It failed  {}'.format(err))
+                return render_template("createN.html", info = globalVars.info)
 
         
 

@@ -5,79 +5,78 @@
 {% block main_content %}
 <form method="post" action="" enctype="multipart/form-data">
     <p><label> Major(s)
-        <select name="major" class="multiple" multiple="multiple">
-         <option class = "default" selected value="NULL">Choose</option>   
+        <select name="major" class="selectpicker " data-live-search = "true" multiple">
+            
             {% for major in info.major %}
             <option value="{{major}}">{{major}}</option>
             {% endfor %}           
         </select>
     </label></p>
     <p><label> Race(s)
-        <select name="race" class="multiple" multiple="multiple">
-        <option class = "default" selected value="NULL">Choose</option>
+        <select name="race" class="selectpicker" data-live-search = "true" multiple>
+        
             {% for race in info.race %}
             <option value="{{race}}">{{race}}</option>
             {% endfor %}           
         </select>
     </label></p>
     <p><label> First Generation Status
-        <select name="firstGen" class="multiple" multiple="multiple">
-    <option class = "default" selected value="NULL">Choose</option>
+        <select name="firstGen" class="selectpicker" data-live-search = "true" multiple>
+    
             {% for stat in info.firstGen %}
             <option value="{{stat}}">{{stat}}</option>
             {% endfor %}           
         </select>
     </label></p>
     <p><label> Spiritual Affiliation(s)
-        <select name="spiritual" class="multiple" multiple="multiple">
-            <option class = "default" selected value="NULL">Choose</option>
+        <select name="spiritual" class="selectpicker" data-live-search = "true" multiple>
+            
             {% for religion in info.religion %}
             <option value="{{religion}}">{{religion}}</option>
             {% endfor %}           
         </select>
     </label></p>
     <p><label> Personality Type
-        <select name="personality" class="multiple" multiple="multiple"><option class = "default" selected value="NULL">Choose</option>
+        <select name="personality" class="selectpicker" data-live-search = "true" multiple>
             {% for personality in info.personality %}
             <option value="{{personality}}">{{personality}}</option>
             {% endfor %}           
         </select>
     </label></p>
     <p><label> Immigration Status
-        <select name="immigration" class="multiple" multiple="multiple">
-         <option class = "default" selected value="NULL">Choose</option>   
+        <select name="immigration" class="selectpicker" data-live-search = "true" multiple>
+            
             {% for imm in info.immigration %}
             <option value="{{imm}}">{{imm}}</option>
             {% endfor %}           
         </select>
     </label></p>
     <p><label> Orgs/Clubs
-        <select name="org" class="multiple" multiple="multiple">
-        <option class = "default" selected value="NULL">Choose</option>
+        <select name="org" class="selectpicker" data-live-search = "true" multiple>
             {% for org in info.club %}
             <option value="{{org}}">{{org}}</option>
             {% endfor %}           
         </select>
     </label></p>
     <p><label> Country
-        <select name="country" class="multiple" multiple="multiple">
-        <option id = "default" selected value="NULL">Choose</option>
+        <select name="country" class="selectpicker" data-live-search = "true" multiple>
+        
             {% for c in info.country %}
             <option value="{{c}}">{{c}}</option>
             {% endfor %}           
         </select>
     </label></p>
-    <p><label> State (if you selected US above)
-        <select name="state" class="multiple" multiple="multiple">
-        <option class = "default" selected value="NULL">Choose</option>
+    <p><label> State (if you  US above)
+        <select name="state" class="selectpicker" data-live-search = "true" multiple>
+        
             {% for s in info.city %}
             <option value="{{s}}">{{s}}</option>
             {% endfor %}           
         </select>
     </label></p>
     <p><label> Career Field 
-        <select name="career" class="multiple" multiple="multiple">
-            <option class = "default" selected value="NULL">Choose</option>
+        <select name="career" class="selectpicker" data-live-search = "true" multiple>
+            
             {% for m in info.career %}
             <option value="{{m}}">{{m}}</option>
             {% endfor %}           
