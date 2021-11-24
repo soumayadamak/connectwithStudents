@@ -30,17 +30,7 @@
 {% block main_content %}
 <h1>Welcome!</h1>
 
-<form method="post" action="" enctype="multipart/form-data">
-  <p><label> Major(s)
-      <select name="major" class="selectpicker" data-live-search = "true" multiple >
-       
-          {% for major in info.major %}
-          <option value="{{major}}">{{major}}</option>
-          {% endfor %}           
-      </select>
-  </label></p>
-  <p><input type="submit" name = "submit" value="Create Account">
-</form>
+
 {% endblock %}
 
   <script src="https://code.jquery.com/jquery-3.4.1.min.js"> </script>
