@@ -46,7 +46,10 @@ def processImage(f,nm,app,curs,conn):
     user_filename = f.filename
     ext = user_filename.split('.')[-1]
     if ext == '':
-        return redirect(url_for('index'))
+        
+        curs.execute(''' update student set profile = %s ''',['default.jpg'])
+        conn.commit()
+       
 
     if ext not in allowed:
         flash('extension not allowed, it needs to be jpg, gif, or png')

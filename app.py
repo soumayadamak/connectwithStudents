@@ -2,6 +2,7 @@ from flask import (Flask, render_template, make_response, url_for, request,
                    redirect, flash, session, send_from_directory, jsonify)
 from werkzeug.utils import secure_filename
 app = Flask(__name__)
+import fetch
 #just for main
 import bcrypt
 import cs304dbi as dbi
@@ -25,11 +26,6 @@ app.secret_key = 'secret'
 app.config['TRAP_BAD_REQUEST_ERRORS'] = True
 app.config['UPLOADS'] = 'uploads'
 app.config['MAX_CONTENT_LENGTH'] = 1 * 1024 * 1024
-
-@app.route('/',methods=['GET','POST'])
-def index():
-    if request.method == "GET":
-        return render_template("base.html", info = globalVars.info)
 
 # create account with required info only initially, the password check happens in the front end, will check the email there too
 # when post and submit value is next , the user is added, a new session is created with user's id, email and logged in recorded 
@@ -111,6 +107,43 @@ def create():
             except Exception as err:
                 flash('It failed  {}'.format(err))
                 return render_template("createN.html", info = globalVars.info)
+#Shows the basic navigation, ie the homepage
+@app.route('/')
+def index():
+    """Landing page of WConnect"""
+    #students has to have : name, email, bio , class, nm 
+
+
+    return render_template('home.html', students = , src = )
+
+
+#main page 
+@app.route('/findamentor/')
+def main():
+    """Main interaction page where mentors/mentees find each other"""
+
+    return render_template("main.html")
+
+#Shows the individual account page
+@app.route('/profile/',methods=['GET','POST'])
+def profile():
+    """Shows user profile page"""
+    return render_template('account.html')
+
+#Shows the student profile when the "view" button is clicked
+@app.route('/profile/<id>', methods=['GET','POST'])
+def view(id):
+    conn = dbi.connect()
+    userInput = request.form
+    user = fetch.studentInfo(conn, id)
+    # if user pressed view button
+    if user['submit'] == "view":
+        fetch.studentInfo(conn,user['id'])
+        flash("Student profile (" + user['id'] + ") succesfully loaded!")
+        return redirect(url_for('profile'))
+
+
+
 
 
 @app.before_first_request

@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<p> Some text that describes me lorem ipsum ipsum lorem. <a href="{{ url_for('account')}}"></a> </p>
+<form method="POST" action="{{url_for('profile', user = 'id')}}">
+<p><label>Name:
+    <input name="name"  value = "{{name}}">
+</label></p>
+<p><label>Class Year:
+    <input name="class" value = "{{class}}">
+</label></p>
+<p><label>Major:
+    <input required type="text" name="major" value = "{{major}}" size="50">
+</label></p>
+</form>
+{% endblock %}

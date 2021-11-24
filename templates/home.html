@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block main_content %}
+<h1>Heyyy</h1>
+
+<p>Are you looking for a peer mentor or a friend to navigate college with? <a href="{{ url_for('findMentor')}}"></a> </p>
+
+<!-- <div id="btnContainer">
+  <button class="btn active" onclick="filterSelection('all')"> Show all</button>
+  <button class="btn" onclick="filterSelection('name')"> Name</button>
+  <button class="btn" onclick="filterSelection('class')"> Class</button>
+  <button class="btn" onclick="filterSelection('major')"> Major</button>
+</div> -->
+
+<div class = "container">
+  {% for row in students | batch(3, '&nbsp;') %}
+  <div class="row">
+    {% for student in row %}
+    <div class="column">
+      <div class = "card">
+        <img src = '{{src}}'>
+        <div class = "container">
+          <h2> {{student.name}} </h2>
+          <p class = "title"> {{student.class}} </p>
+          <p> {{student.bio}}</p>
+          <p> {{student.email}} </p>
+          <form method="post" action="{{url_for('view', id = student.nm)}}">
+          <p><button  type = "submit" name = "view" class="button">View</button></p>
+          </form>
+          <p><button class="button">Contact</button></p>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+</div>
+{% endfor %}
+</div>
+
+{% endblock %}
