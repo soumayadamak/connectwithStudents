@@ -1,68 +1,8 @@
 {% extends 'base.html' %}
 
-{% block content %}
-<p>Click to <a href="{{ url_for('base') }}">return to the home page</a>.</p>
-<p>Are you looking for a peer mentor or a friend to navigate college with? <a href="{{ url_for('main')}}"></a> </p>
-<h1> {{name}}</h1>
-<style>
+{% block main_content %}
+<p>Click to <a href="{{ url_for('index') }}">return to the home page</a>.</p>
+<p>Are you looking for a peer mentor or a friend to navigate college with?  </p>
 
-HTML {
-    --color-header: #000080; /* color for H1-H6 and others. was deepskyblue but poor contrast. */
-    --color-hilite: gold;  /* was red, but this avoids WAVE contrast errors */ 
-    --color-focus: gold;
-    --font-family: Verdana;
-    font-family: var(--font-family);
-    align-items: center;
-}
-nav > ul {
-    display: inline-flex;
-    flex-direction: row;
-}
 
-nav ul {
-    list-style-type: none;
-    margin: 0px;
-    padding: 0px;
-}
-
-nav > ul > li {
-    flex: 0 0 auto;
-    width: 15em; 
-}
-
-nav button, nav a {
-    display: block;
-    box-sizing: border-box; /* easier to make button and A the same size */
-    width: 100%;
-    height: 40px;
-    padding: 0px;
-    padding-bottom: 5px;
-    background-color: var(--color-header); /* was #3498db */
-    border: 2px solid white;
-    border-radius: 5px;
-    cursor: pointer;
-    font-family: var(--font-family);
-    font-weight: bold;
-    font-size: 1.4rem;
-}
-
-/* Only the top-level buttons are centered; lower ones are left-aligned. */
-nav > ul > li > button , nav > ul > li > a {
-    text-align: center;
-}
-
-</style>
-
-<form method="post" action="">
-    <p>Search for a student <label for="username">name: <input type="text" name="username"></label></p>
-    <p><input type="submit"></p>
-</form>
-
-<div class="container" id="containerMain">
-    <div class="row">
-        <div class="col-sm-12 col-md-12 col-ls-12" id="matchInfo" align="center">
-        <button id="matchBtn" type="button">Match Me!</button>
-        </div>
-    </div>
-</div>
 {% endblock %}

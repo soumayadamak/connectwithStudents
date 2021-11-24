@@ -2,7 +2,7 @@ from flask import (Flask, render_template, make_response, url_for, request,
                    redirect, flash, session, send_from_directory, jsonify)
 from werkzeug.utils import secure_filename
 app = Flask(__name__)
-import fetch
+
 #just for main
 import bcrypt
 import cs304dbi as dbi
@@ -107,40 +107,43 @@ def create():
             except Exception as err:
                 flash('It failed  {}'.format(err))
                 return render_template("createN.html", info = globalVars.info)
+
+@app.route("/pic/<profile>")
+def findPic(profile):
+    return send_from_directory(app.config['UPLOADS'],profile)
+
+
 #Shows the basic navigation, ie the homepage
 @app.route('/')
 def index():
     """Landing page of WConnect"""
     #students has to have : name, email, bio , class, nm 
 
+    conn = dbi.connect()
+    curs = dbi.dict_cursor(conn)
+    curs.execute(''' select * from student''')
+    students = curs.fetchall()
+    print(students)
+    for student in students:
+        student["source"] = url_for('findPic',profile = student["profile"])
 
-    return render_template('home.html', students = , src = )
+    return render_template('home.html', students = students, nm = session["uid"])
 
 
 #main page 
 @app.route('/findamentor/')
-def main():
+def findMentor():
     """Main interaction page where mentors/mentees find each other"""
 
-    return render_template("main.html")
+    return render_template("findMentor.html", nm = session["uid"])
 
-#Shows the individual account page
-@app.route('/profile/',methods=['GET','POST'])
-def profile():
-    """Shows user profile page"""
-    return render_template('account.html')
 
 #Shows the student profile when the "view" button is clicked
 @app.route('/profile/<id>', methods=['GET','POST'])
 def view(id):
     conn = dbi.connect()
-    userInput = request.form
-    user = fetch.studentInfo(conn, id)
-    # if user pressed view button
-    if user['submit'] == "view":
-        fetch.studentInfo(conn,user['id'])
-        flash("Student profile (" + user['id'] + ") succesfully loaded!")
-        return redirect(url_for('profile'))
+    user = student.studentInfo(conn, id)
+    return render_template("account.html", nm = session["uid"], student = user)
 
 
 
