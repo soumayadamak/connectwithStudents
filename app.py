@@ -15,15 +15,21 @@ import random
 
 app.secret_key = 'your secret here'
 # replace that with a random key
-app.secret_key = ''.join([ random.choice(('ABCDEFGHIJKLMNOPQRSTUVXYZ' +
-                                          'abcdefghijklmnopqrstuvxyz' +
-                                          '0123456789'))
-                           for i in range(20) ])
+app.secret_key = 'secret'
+# ''.join([ random.choice(('ABCDEFGHIJKLMNOPQRSTUVXYZ' +
+#                                           'abcdefghijklmnopqrstuvxyz' +
+#                                           '0123456789'))
+#                            for i in range(20) ])
 
 # This gets us better error messages for certain common request errors
 app.config['TRAP_BAD_REQUEST_ERRORS'] = True
 app.config['UPLOADS'] = 'uploads'
 app.config['MAX_CONTENT_LENGTH'] = 1 * 1024 * 1024
+
+@app.route('/',methods=['GET','POST'])
+def index():
+    if request.method == "GET":
+        return render_template("base.html", info = globalVars.info)
 
 # create account with required info only initially, the password check happens in the front end, will check the email there too
 # when post and submit value is next , the user is added, a new session is created with user's id, email and logged in recorded 
@@ -39,9 +45,6 @@ def create():
         if info["submit"] == "Next":
             email = info["email"]
             pass1 = info["password1"]
-            # if pass2 != pass1:
-            #     flash ("passwords don't match")
-            #     return render_template("createR.html", info = globalVars.info)
             hashed = bcrypt.hashpw(pass1.encode('utf-8'),
                             bcrypt.gensalt())
             stored = hashed.decode('utf-8')
@@ -60,76 +63,54 @@ def create():
             session['uid'] = uid
             session['logged_in'] = True
             session['visits'] = 1
-            return render_template( "create.html", info = globalVars.info)
+            return render_template( "createN.html", info = globalVars.info)
         else: 
             try:
                 nm = session['uid']
-                print(info)
+                flash(nm)
                 columns = ["race","firstGen","spiritual","personality","immigration","city","bio","career"]
                 final = []
                 for col in columns:
-                    final.append(info[col])
-                    print(final)
+                    elt = info.getlist(col)
+                    print(elt)
+                    if elt == []:
+                        elt = None
+                    else:
+                        elt = ','.join(elt)
+                    final.append(elt)
+                 
                 final.append(nm)
                 curs.execute(''' update student set race = %s, firstGen = %s, spiritual = %s,
-                 personality = %s, immigration = %s, city = %s, bio = %s, career = %s where nm = %s''',final)
+                    personality = %s, immigration = %s, city = %s, bio = %s, career = %s where nm = %s''',final)
                 conn.commit()
+        
+                hobbies = info["hobby"].strip().lower()
+                
+                if len(hobbies) != 0:
+                    student.processHobby(curs,hobbies,conn,nm)
 
-                if len(info["hobby"]) != 0:
-                    student.processHobby()
-                if info["country"] != "NULL":
-                    #process country 
-                if info["org"] != "NULL":
-                    #process org 
-                if info["major"] != "NULL":
-                    #process major
+                country = list(info.getlist("country"))
+                org =list( info.getlist("org"))
+                major = list(info.getlist("major"))
 
-                allowed = {'jpg','gif','png'}
+                if len(country) != 0:
+                    student.processCountry(curs,country,conn,nm)
+                    
+                if len(org) != 0:
+                    student.processOrg(curs,org,conn,nm)
+
+                if len(major) != 0:
+                    student.processMajor(curs,major,conn,nm)
+
                 #process image
                 f = request.files['pic']
-                user_filename = f.filename
-                ext = user_filename.split('.')[-1]
-                if ext not in allowed:
-                    flash('extension not allowed, it needs to be jpg, gif, or png')
-                    return render_template(create.html, info = globalVars.info)
-                else:
-                    filename = secure_filename('{}.{}'.format(nm,ext))
-                    pathname = os.path.join(app.config['UPLOADS'],filename)
-                    f.save(pathname)
-                    curs.execute(''' update student set profile = %s ''',[filename])
-                    conn.commit()
-                #change the return here to redirect to user url?
-                return render_template("base.html")
+                student.processImage(f,nm,app,curs,conn)
+                
+                return redirect(url_for('index'))
 
             except Exception as err:
-                flash('Upload failed because {why}'.format(err))
-                return render_template(create.html, info = globalVars.info)
-
-        
-
-# @app.route('/user/<username>')
-# def user(username):
-#     try:
-#         # don't trust the URL; it's only there for decoration
-#         if 'username' in session:
-#             username = session['username']
-#             uid = session['uid']
-#             session['visits'] = 1+int(session['visits'])
-#             return render_template('greet.html',
-#                                    page_title='My App: Welcome {}'.format(username),
-#                                    name=username,
-#                                    uid=uid,
-#                                    visits=session['visits'])
-#         else:
-#             flash('you are not logged in. Please login or join')
-#             return redirect( url_for('index') )
-#     except Exception as err:
-#         flash('some kind of error '+str(err))
-#         return redirect( url_for('index') )
-
-
-
-
+                flash('It failed  {}'.format(err))
+                return render_template("createN.html", info = globalVars.info)
 
 
 @app.before_first_request
@@ -243,4 +224,27 @@ if __name__ == '__main__':
 #         return redirect(url_for('index'))
 #     else:
 #         flash('you are not logged in. Please login or join')
+#         return redirect( url_for('index') )
+
+
+        
+
+# @app.route('/user/<username>')
+# def user(username):
+#     try:
+#         # don't trust the URL; it's only there for decoration
+#         if 'username' in session:
+#             username = session['username']
+#             uid = session['uid']
+#             session['visits'] = 1+int(session['visits'])
+#             return render_template('greet.html',
+#                                    page_title='My App: Welcome {}'.format(username),
+#                                    name=username,
+#                                    uid=uid,
+#                                    visits=session['visits'])
+#         else:
+#             flash('you are not logged in. Please login or join')
+#             return redirect( url_for('index') )
+#     except Exception as err:
+#         flash('some kind of error '+str(err))
 #         return redirect( url_for('index') )
