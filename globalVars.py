@@ -1,3 +1,4 @@
+#a list of the variables that are used to create the front end of the creat account 
 info = { "year" : ["2022","2023","2024","2025"],
 "race" : ["Native American/Alaska Native", "Black/African American", "White/non Hispanic","Asian","Middle Eastern/North African","Hispanic/Latinx","Pacific Islander","Not Listed"],
 "firstGen" : ["First Generation", "Low Income Background"],
