@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block main_content %}
+<h1>Heyyy</h1>
+
+<p>Are you looking for a peer mentor or a friend to navigate college with?</p>
+
+
+<div class = "container">
+  {% for row in students | batch(3) %}
+  <div class="row">
+    {% for student in row %}
+    <div class="column">
+      <div class = "card">
+        <img src = '../static/default.jpg'>
+        <div class = "container">
+          <h2> {{student.name}} </h2>
+          <p class = "title"> {{student.class}} </p>
+          <p> {{student.bio}}</p>
+          <p> {{student.email}} </p>
+          <form method="post" action="{{url_for('view', id = student.nm)}}">
+          <p><button  type = "submit" name = "view" class="button">View</button></p>
+          </form>
+          <p><button class="button">Contact</button></p>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+</div>
+{% endfor %}
+</div>
+
+{% endblock %}

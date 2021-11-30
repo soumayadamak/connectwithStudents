@@ -2,10 +2,12 @@ from flask import (Flask, render_template, make_response, url_for, request,
                    redirect, flash, session, send_from_directory, jsonify)
 from werkzeug.utils import secure_filename
 app = Flask(__name__)
-#just for main
+
+
 import bcrypt
 import cs304dbi as dbi
 # import cs304dbi_sqlite3 as dbi
+
 #contains global variables needed to make the account form 
 import globalVars 
 
@@ -13,35 +15,29 @@ import globalVars
 import student
 import random
 
-app.secret_key = 'your secret here'
 # replace that with a random key
 app.secret_key = 'secret'
-# ''.join([ random.choice(('ABCDEFGHIJKLMNOPQRSTUVXYZ' +
-#                                           'abcdefghijklmnopqrstuvxyz' +
-#                                           '0123456789'))
-#                            for i in range(20) ])
+
 
 # This gets us better error messages for certain common request errors
 app.config['TRAP_BAD_REQUEST_ERRORS'] = True
 app.config['UPLOADS'] = 'uploads'
 app.config['MAX_CONTENT_LENGTH'] = 1 * 1024 * 1024
 
-@app.route('/',methods=['GET','POST'])
-def index():
-    if request.method == "GET":
-        return render_template("base.html", info = globalVars.info)
-
-# create account with required info only initially, the password check happens in the front end, will check the email there too
+# create account with required info only initially, the password check happens in the front end
 # when post and submit value is next , the user is added, a new session is created with user's id, email and logged in recorded 
 # it then shows the second form of the non required information which will be handeled by same function but will just update 
+#after the non required information is processed, it redirects to the home page 
 @app.route('/create/', methods=['GET','POST'])
 def create():
     if request.method == "GET":
         return render_template("createR.html", info = globalVars.info)
     else:
+
         info = request.form.copy()
         conn = dbi.connect()
         curs = dbi.cursor(conn)
+        #process the required information 
         if info["submit"] == "Next":
             email = info["email"]
             pass1 = info["password1"]
@@ -49,6 +45,7 @@ def create():
                             bcrypt.gensalt())
             stored = hashed.decode('utf-8')
             try:
+                
                 curs.execute('''INSERT INTO student(name,email,password,mentor,mentee,class)
                                 VALUES(%s,%s,%s,%s,%s,%s)''',
                             [info["name"],email,stored,info["mentor"],info["mentee"],info["year"]])
@@ -66,13 +63,14 @@ def create():
             return render_template( "createN.html", info = globalVars.info)
         else: 
             try:
+                #process non required information
                 nm = session['uid']
                 flash(nm)
                 columns = ["race","firstGen","spiritual","personality","immigration","city","bio","career"]
                 final = []
+                #update the student table
                 for col in columns:
                     elt = info.getlist(col)
-                    print(elt)
                     if elt == []:
                         elt = None
                     else:
@@ -85,7 +83,7 @@ def create():
                 conn.commit()
         
                 hobbies = info["hobby"].strip().lower()
-                
+                #update the hobby tables
                 if len(hobbies) != 0:
                     student.processHobby(curs,hobbies,conn,nm)
 
@@ -93,24 +91,61 @@ def create():
                 org =list( info.getlist("org"))
                 major = list(info.getlist("major"))
 
+                #update the country table
                 if len(country) != 0:
                     student.processCountry(curs,country,conn,nm)
-                    
+                
+                #update the club table
                 if len(org) != 0:
                     student.processOrg(curs,org,conn,nm)
-
+                #update the major table
                 if len(major) != 0:
                     student.processMajor(curs,major,conn,nm)
 
                 #process image
                 f = request.files['pic']
                 student.processImage(f,nm,app,curs,conn)
-                
+                #redirect to home page 
                 return redirect(url_for('index'))
 
             except Exception as err:
                 flash('It failed  {}'.format(err))
                 return render_template("createN.html", info = globalVars.info)
+
+
+
+#Shows the basic navigation, ie the homepage, which will display all the users in the app (will later add the filter feature)
+@app.route('/')
+def index():
+    if 'logged_in' in session:
+
+        """Landing page of WConnect"""
+        conn = dbi.connect()
+        curs = dbi.dict_cursor(conn)
+        curs.execute(''' select * from student''')
+        students = curs.fetchall()
+        return render_template('home.html', students = students, nm = session["uid"])
+    else:
+        return redirect(url_for('create'))
+
+
+#main page 
+@app.route('/findamentor/')
+def findMentor():
+    #will be implemented later
+    """Main interaction page where mentors/mentees find each other"""
+    return render_template("findMentor.html", nm = session["uid"])
+
+
+#Shows the student profile when the "view" button is clicked
+@app.route('/profile/<id>', methods=['GET','POST'])
+def view(id):
+    conn = dbi.connect()
+    user = student.studentInfo(conn, id)
+    return render_template("account.html", nm = session["uid"], student = user)
+
+
+
 
 
 @app.before_first_request
@@ -133,118 +168,8 @@ if __name__ == '__main__':
     app.run('0.0.0.0',port)
 
 
-# @app.route('/')
-# def index():
-#     return render_template('main.html',title='Hello')
 
-# @app.route('/greet/', methods=["GET", "POST"])
-# def greet():
-#     if request.method == 'GET':
-#         return render_template('greet.html', title='Customized Greeting')
-#     else:
-#         try:
-#             username = request.form['username'] # throws error if there's trouble
-#             flash('form submission successful')
-#             return render_template('greet.html',
-#                                    title='Welcome '+username,
-#                                    name=username)
-
-#         except Exception as err:
-#             flash('form submission error'+str(err))
-#             return redirect( url_for('index') )
-
-# @app.route('/formecho/', methods=['GET','POST'])
-# def formecho():
-#     if request.method == 'GET':
-#         return render_template('form_data.html',
-#                                method=request.method,
-#                                form_data=request.args)
-#     elif request.method == 'POST':
-#         return render_template('form_data.html',
-#                                method=request.method,
-#                                form_data=request.form)
-#     else:
-#         # maybe PUT?
-#         return render_template('form_data.html',
-#                                method=request.method,
-#                                form_data={})
-
-
-
-#log in page later 
-
-
-# @app.route('/login/', methods=["POST"])
-# def login():
-#     username = request.form.get('username')
-#     passwd = request.form.get('password')
-#     conn = dbi.connect()
-#     curs = dbi.dict_cursor(conn)
-#     curs.execute('''SELECT uid,hashed
-#                     FROM userpass
-#                     WHERE username = %s''',
-#                  [username])
-#     row = curs.fetchone()
-#     if row is None:
-#         # Same response as wrong password,
-#         # so no information about what went wrong
-#         flash('login incorrect. Try again or join')
-#         return redirect( url_for('index'))
-#     stored = row['hashed']
-#     print('LOGIN', username)
-#     print('database has stored: {} {}'.format(stored,type(stored)))
-#     print('form supplied passwd: {} {}'.format(passwd,type(passwd)))
-#     hashed2 = bcrypt.hashpw(passwd.encode('utf-8'),
-#                             stored.encode('utf-8'))
-#     hashed2_str = hashed2.decode('utf-8')
-#     print('rehash is: {} {}'.format(hashed2_str,type(hashed2_str)))
-#     if hashed2_str == stored:
-#         print('they match!')
-#         flash('successfully logged in as '+username)
-#         session['username'] = username
-#         session['uid'] = row['uid']
-#         session['logged_in'] = True
-#         session['visits'] = 1
-#         return redirect( url_for('user', username=username) )
-#     else:
-#         flash('login incorrect. Try again or join')
-#         return redirect( url_for('index'))
-
-
-#logout : later
-
-# @app.route('/logout/')
-# def logout():
-#     if 'username' in session:
-#         username = session['username']
-#         session.pop('username')
-#         session.pop('uid')
-#         session.pop('logged_in')
-#         flash('You are logged out')
-#         return redirect(url_for('index'))
-#     else:
-#         flash('you are not logged in. Please login or join')
-#         return redirect( url_for('index') )
-
-
-        
-
-# @app.route('/user/<username>')
-# def user(username):
-#     try:
-#         # don't trust the URL; it's only there for decoration
-#         if 'username' in session:
-#             username = session['username']
-#             uid = session['uid']
-#             session['visits'] = 1+int(session['visits'])
-#             return render_template('greet.html',
-#                                    page_title='My App: Welcome {}'.format(username),
-#                                    name=username,
-#                                    uid=uid,
-#                                    visits=session['visits'])
-#         else:
-#             flash('you are not logged in. Please login or join')
-#             return redirect( url_for('index') )
-#     except Exception as err:
-#         flash('some kind of error '+str(err))
-#         return redirect( url_for('index') )
+# @app.route("/pic/<profile>")
+# def findPic(profile):
+#     print("it got here")
+#     return send_from_directory(app.config['UPLOADS'],profile)
