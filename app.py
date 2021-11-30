@@ -117,12 +117,16 @@ def create():
 #Shows the basic navigation, ie the homepage, which will display all the users in the app (will later add the filter feature)
 @app.route('/')
 def index():
-    """Landing page of WConnect"""
-    conn = dbi.connect()
-    curs = dbi.dict_cursor(conn)
-    curs.execute(''' select * from student''')
-    students = curs.fetchall()
-    return render_template('home.html', students = students, nm = session["uid"])
+    if 'logged_in' in session:
+
+        """Landing page of WConnect"""
+        conn = dbi.connect()
+        curs = dbi.dict_cursor(conn)
+        curs.execute(''' select * from student''')
+        students = curs.fetchall()
+        return render_template('home.html', students = students, nm = session["uid"])
+    else:
+        return redirect(url_for('create'))
 
 
 #main page 
