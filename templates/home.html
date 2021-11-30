@@ -10,9 +10,10 @@
   {% for row in students | batch(3) %}
   <div class="row">
     {% for student in row %}
+    {% set alt = "profile photo of " + student.name %}
     <div class="column">
       <div class = "card">
-        <img src = '../static/default.jpg'>
+        <img src = '{{student.src}}' alt = {{alt}}>
         <div class = "container">
           <h2> {{student.name}} </h2>
           <p class = "title"> {{student.class}} </p>

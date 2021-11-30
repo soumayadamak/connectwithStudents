@@ -30,7 +30,7 @@ Engine = innoDB;
 create table student(
    nm int auto_increment not null  primary key ,
    name varchar(20) not null,
-   email varchar(20) not null,
+   email varchar(40) not null,
    unique(email),
    index(email),
    password char(60) not null,

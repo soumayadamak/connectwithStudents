@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block nav %}
+<h1> Log in </h1>
+{% endblock %}
+{% block main_content %}
+
+<form id = 'joinform' method="post" action="{{url_for('login')}}" >
+    <p><label class = "required" >Email: <input required type="email" name="email"></label></p>
+    <p><label class = "required" >Password: <input required type="text" name="password"></label></p>
+    
+    <p><input type="submit" name = "submit" value="Log in">
+</form>
+
+<p> Don't have an account yet? <a href="{{url_for('create')}}" > Create one here. </a></p>
+{% endblock %}
+{% block end_scripts %}
+<script>
+    $("#joinform").on('submit', function (event) {
+         var email = $(this).find('[name=email]').val().split("@")[1].split(".")[0];
+        if( email != 'wellesley'){
+            event.preventDefault();
+            alert("not a valid wellesley email");
+         }
+         else{
+             return true;
+         }
+    });
+    </script>
+{% endblock %}
+

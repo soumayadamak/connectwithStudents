@@ -30,6 +30,7 @@ app.config['MAX_CONTENT_LENGTH'] = 1 * 1024 * 1024
 #after the non required information is processed, it redirects to the home page 
 @app.route('/create/', methods=['GET','POST'])
 def create():
+
     if request.method == "GET":
         return render_template("createR.html", info = globalVars.info)
     else:
@@ -118,17 +119,59 @@ def create():
 @app.route('/')
 def index():
     if 'logged_in' in session:
-
         """Landing page of WConnect"""
         conn = dbi.connect()
         curs = dbi.dict_cursor(conn)
         curs.execute(''' select * from student''')
         students = curs.fetchall()
+        
+        for student in students: 
+            if student.get("profile") == None:
+                student["profile"] = 'default.jpg'
+            student["src"] = url_for('findPic', profile = student.get("profile"))
         return render_template('home.html', students = students, nm = session["uid"])
     else:
-        return redirect(url_for('create'))
+        return redirect(url_for('login'))
 
+@app.route('/logout/')
+def logout():
+    """resets logged_in, uid and email keys of the session and redirects to the log in url """
+    session.pop('logged_in')
+    session.pop('uid')
+    session.pop('email')
+    return redirect(url_for('login'))
+    
+@app.route('/login/', methods=['GET','POST'])
+def login():
+    """Diplays the log in page or processes the log in information. Returns 
+    the home page if the user already logged in or logs in successfully and returns
+    the log in page if the log in information is not correct """
+    if request.method == "GET":
+        #if user already logged in 
+        if 'logged_in' in session:
+            flash("already logged in")
+            return redirect(url_for('index'))
+        else:
+            #user not logged in yet 
+            return render_template("login.html")
+    else:
+        info = request.form
+        email = info["email"].strip()
+        password = info["password"]
+        conn = dbi.connect()
+        logged, nm = student.login(conn, email, password)
+        if logged:
+            session['logged_in'] = True
+            session['visits'] += 1
+            session['uid'] = nm
+            session['email'] = email
+            return redirect(url_for('index'))
+        else:
+            flash("Wrong username or password")
+            return render_template("login.html")
 
+        
+            
 #main page 
 @app.route('/findamentor/')
 def findMentor():
@@ -145,7 +188,10 @@ def view(id):
     return render_template("account.html", nm = session["uid"], student = user)
 
 
-
+@app.route("/pic/<profile>")
+def findPic(profile):
+    print("it got here")
+    return send_from_directory(app.config['UPLOADS'],profile)
 
 
 @app.before_first_request
@@ -169,7 +215,3 @@ if __name__ == '__main__':
 
 
 
-# @app.route("/pic/<profile>")
-# def findPic(profile):
-#     print("it got here")
-#     return send_from_directory(app.config['UPLOADS'],profile)

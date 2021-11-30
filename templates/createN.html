@@ -3,7 +3,7 @@
 <h1> Fill your profile </h1>
 {% endblock %}
 {% block main_content %}
-<form method="post" action="" enctype="multipart/form-data">
+<form method="post" action="{{url_for('create')}}" enctype="multipart/form-data">
     <p><label> Major(s)
         <select name="major" class="selectpicker " data-live-search = "true" multiple>
             

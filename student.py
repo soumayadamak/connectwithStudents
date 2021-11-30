@@ -4,7 +4,7 @@ from flask import (Flask, render_template, make_response, url_for, request,
                    redirect, flash, session, send_from_directory, jsonify)
 
 import cs304dbi as dbi
-
+import bcrypt
 #Input: cursor, conenciton, a string of the hobbies seperated by commas, and the user id
 # seperates the hobbies, checks if the hobbies already exist in the hobby table and adds them if not. 
 #It then adds the user the hobby to the hasHobby table
@@ -13,14 +13,17 @@ def processHobby(curs,hobbies,conn,nm):
         hobbies = hobbies.split(',')
         for hobby in hobbies:
             hobby = hobby.strip()
-            curs.execute(''' select hb from hobby where name LIKE %s''', ['%'+hobby+'%'])
-            c = curs.fetchall()
-            if len(c) == 0 :
+            try: 
                 curs.execute(''' insert into hobby(name) values (%s)''',[hobby])
                 conn.commit()
                 curs.execute('select last_insert_id()')
                 row = curs.fetchone()
                 c = row[0]
+            except Exception as error:
+                curs.execute(''' select hb from hobby where name LIKE %s''', [hobby])
+        
+                c = curs.fetchone()[0]
+
             curs.execute(''' insert into hasHobby(nm,hb) values (%s,%s)''',[nm,c])
             conn.commit()
     except Exception as err:
@@ -42,8 +45,8 @@ def processCountry(curs,country,conn,nm):
 def processOrg(curs,org,conn,nm):
     for orga in org: 
         orga = orga.split()[0]
-        curs.execute(''' select clid from club where clubName LIKE %s''', ['%'+orga.strip()+'%'])
-        c = curs.fetchall()[0][0]
+        curs.execute(''' select clid from club where clubName LIKE %s''', [orga.strip()+'%'])
+        c = curs.fetchone()[0][0]
         curs.execute(''' insert into inClub(nm,clid) values (%s,%s)''',[nm,c])
         conn.commit()
 
@@ -87,3 +90,24 @@ def studentInfo(conn, id):
     curs.execute(sql,[id])
     info = curs.fetchone()
     return info
+
+
+def login(conn, email, password):
+    '''tries to log the user in given email & password. Returns True if
+success and returns the uid as the second value on success.'''
+    curs = dbi.cursor(conn)
+    curs.execute('''SELECT nm, password FROM student WHERE email = %s''',
+                 [email])
+    row = curs.fetchone()
+    if row is None:
+        # no such user
+        return (False, False)
+    nm, hashed = row
+    hashed2_bytes = bcrypt.hashpw(password.encode('utf-8'),
+                                  hashed.encode('utf-8'))
+    hashed2 = hashed2_bytes.decode('utf-8')
+    if hashed == hashed2:
+        return (True, nm)
+    else:
+        # password incorrect
+        return (False, False)
