@@ -40,7 +40,7 @@ def processCountry(curs,country,conn,nm):
         c = curs.fetchall()[0][0]
         curs.execute(''' insert into fromCountry(nm,cid) values (%s,%s)''',[nm,c])
         conn.commit()    
-        
+
 #Input: cursor, connection, a list of the clubs and user id
 # Loops through the clubs that the user selected and adds each club to the inClub table
 def processOrg(curs,org,conn,nm):
@@ -138,7 +138,7 @@ def studentInfo(conn, id):
     sql = "select * from student where nm = %s"
     curs.execute(sql,[id])
     info = curs.fetchone()
-    
+    #add information collected from other tables here in the form of list 
     return info
 
 
