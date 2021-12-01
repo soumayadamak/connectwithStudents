@@ -114,7 +114,7 @@ def index():
     #students has to have : name, email, bio , class, nm 
 
 
-    return render_template('home.html', students = , src = )
+    return render_template('home.html')
 
 
 #main page 
