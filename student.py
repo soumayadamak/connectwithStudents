@@ -40,6 +40,7 @@ def processCountry(curs,country,conn,nm):
         c = curs.fetchall()[0][0]
         curs.execute(''' insert into fromCountry(nm,cid) values (%s,%s)''',[nm,c])
         conn.commit()    
+        
 #Input: cursor, connection, a list of the clubs and user id
 # Loops through the clubs that the user selected and adds each club to the inClub table
 def processOrg(curs,org,conn,nm):
@@ -82,6 +83,54 @@ def processImage(f,nm,app,curs,conn):
         curs.execute(''' update student set profile = %s where nm = %s''',[name,nm])
         conn.commit()
 
+#processes the non required inputs 
+def updateNonRequired(info,nm,conn,curs,app):
+    columns = ["race","firstGen","spiritual","personality","immigration","city","bio","career"]
+    final = []
+    #update the student table
+    for col in columns:
+        elt = info.getlist(col)
+        if elt == []:
+            elt = None
+        else:
+            elt = ','.join(elt)
+        final.append(elt)
+        
+    final.append(nm)
+    curs.execute(''' update student set race = %s, firstGen = %s, spiritual = %s,
+        personality = %s, immigration = %s, city = %s, bio = %s, career = %s where nm = %s''',final)
+    conn.commit()
+    hobbies = info["hobby"].strip().lower()
+    #update the hobby tables
+    if len(hobbies) != 0:
+        processHobby(curs,hobbies,conn,nm)
+
+    country = list(info.getlist("country"))
+    org =list( info.getlist("org"))
+    major = list(info.getlist("major"))
+
+    #update the country table
+    if len(country) != 0:
+        processCountry(curs,country,conn,nm)
+    
+    #update the club table
+    if len(org) != 0:
+        processOrg(curs,org,conn,nm)
+    #update the major table
+    if len(major) != 0:
+        processMajor(curs,major,conn,nm)
+    
+    #process image
+    f = request.files['pic']
+    processImage(f,nm,app,curs,conn)
+    
+
+#processes some of the required input 
+def updateRequired(info,nm,conn,curs):
+    curs.execute(''' update student set name = %s,mentor = %s,mentee = %s ,
+    class = %s where nm = %s''',[info["name"],info["mentor"],info["mentee"],info["year"], nm])
+    conn.commit()
+
 # Input: conenction and stduent id
 # Output: the information of the given student 
 def studentInfo(conn, id):
@@ -89,6 +138,7 @@ def studentInfo(conn, id):
     sql = "select * from student where nm = %s"
     curs.execute(sql,[id])
     info = curs.fetchone()
+    
     return info
 
 

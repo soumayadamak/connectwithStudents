@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+{% block main_content %}
+<form method="post" action="{{url_for('edit')}}" enctype="multipart/form-data">
+    <p><label> Major(s)
+        <select name="major" class="selectpicker " data-live-search = "true" multiple>
+            
+            {% for major in info.major %}
+                {% if major in student.majors %}
+                    <option value="{{major}}" selected >{{major}}</option>
+                {% else %}
+                    <option value="{{major}}" >{{major}}</option>
+                {% endif %}
+            {% endfor %}           
+        </select>
+    </label></p>
+
+    <p><label> Race(s)
+        <select name="race" class="selectpicker" data-live-search = "true" multiple>
+           
+            {% for race in info.race %}
+                {% if race in student.races %}
+                    <option value="{{race}}" selected>{{race}}</option>
+                {% else %}
+                    <option value="{{race}}" >{{race}}</option>
+                {% endif %}
+            {% endfor %}           
+        </select>
+    </label></p>
+
+    <p><label> First Generation Status
+        <select name="firstGen" class="selectpicker" data-live-search = "true" multiple>
+            
+            {% for stat in info.firstGen %}
+                {% if stat in student.firstGen %}
+                    <option value="{{stat}}" selected >{{stat}}</option>
+                {% else %}
+                    <option value="{{stat}}" >{{stat}}</option>
+                {% endif %}
+            {% endfor %}           
+        </select>
+    </label></p>
+
+    <p><label> Spiritual Affiliation(s)
+        <select name="spiritual" class="selectpicker" data-live-search = "true" multiple>
+            
+            {% for religion in info.religion %}
+                {% if religion in student.spiritual %}
+                    <option value="{{religion}}" selected >{{religion}}</option>
+                {% else %}
+                    <option value="{{religion}}">{{religion}}</option>
+                {% endif %}
+            {% endfor %}           
+        </select>
+    </label></p>
+
+    <p><label> Personality Type
+        <select name="personality" class="selectpicker" data-live-search = "true" multiple>
+            {% for personality in info.personality %}
+                {% if personality in student.personality %}
+                    <option value="{{personality}}" selected >{{personality}}</option>
+                {% else %}
+                    <option value="{{personality}}">{{personality}}</option>
+                {% endif %}
+            {% endfor %}           
+        </select>
+    </label></p>
+
+    <p><label> Immigration Status
+        <select name="immigration" class="selectpicker" data-live-search = "true" multiple>
+            
+            {% for imm in info.immigration %}
+                {% if imm in student.immigration%}
+                    <option value="{{imm}}" selected>{{imm}}</option>
+                {%else%}
+                    <option value="{{imm}}" >{{imm}}</option>
+                {% endif %}
+            {% endfor %}           
+        </select>
+    </label></p>
+
+    <p><label> Orgs/Clubs
+        <select name="org" class="selectpicker" data-live-search = "true" multiple>
+            {% for org in info.club %}
+                {% if org in student.orgs %}
+                    <option value="{{org}}" selected>{{org}}</option>
+                {% else %}
+                    <option value="{{org}}">{{org}}</option>
+                {% endif %}
+            {% endfor %}           
+        </select>
+    </label></p>
+
+    <p><label> Country
+        <select name="country" class="selectpicker" data-live-search = "true" multiple>
+        
+            {% for c in info.country %}
+                {% if c in student.country %}
+                    <option value="{{c}}" selected >{{c}}</option>
+                {% else %}
+                    <option value="{{c}}">{{c}}</option>
+                {% endif %}
+            {% endfor %}           
+        </select>
+    </label></p>
+
+    <p><label> State (if you  US above)
+        <select name="state" class="selectpicker" data-live-search = "true" multiple>
+        
+            {% for s in info.city %}
+                {% if s in student.city %}
+                    <option value="{{s}}" selected >{{s}}</option>
+                {% else %}
+                    <option value="{{s}}"  >{{s}}</option>
+                {% endif %}
+            {% endfor %}           
+        </select>
+    </label></p>
+
+    <p><label> Career Field 
+        <select name="career" class="selectpicker" data-live-search = "true" multiple>
+            {% for m in info.career %}
+                {% if m in student.career%}
+                    <option value="{{m}}" selected>{{m}}</option>
+                {% else %}
+                    <option value="{{m}}" >{{m}}</option>
+                {% endif %}
+            {% endfor %}           
+        </select>
+    </label></p>
+
+    <p><label class = "required" >Year Group:
+        <select required name="year">
+            <option value="">choose</option>
+            {% for year in info.year %}
+            {% if year in student.class %}
+            <option value="{{year}}" selected >{{year}}</option>
+            {% else %}
+            <option value="{{year}}" >{{year}}</option>
+            {% endif %}
+            {% endfor %}
+        </select>
+    </label></p>
+    <p><label class = "required">Looking for a mentee(little)?
+        {% if student.mentor in ["yes"] %}
+        <input required type="radio" name="mentor" value="yes" checked > Yes </input>
+        <input required type="radio" name="mentor" value="no"> No </input>
+        {% else %}
+        <input required type="radio" name="mentor" value="yes"  > Yes </input>
+        <input required type="radio" name="mentor" value="no" checked > No </input>
+        {% endif %}
+    </label></p>
+    <p><label class = "required">Looking for a mentor(big)?
+        {% if student.mentee in ["yes"] %}
+        <input required type="radio" name="mentee" value="yes" checked > Yes </input>
+        <input required type="radio" name="mentee" value="no"> No </input>
+        {% else %}
+        <input required type="radio" name="mentee" value="yes"  > Yes </input>
+        <input required type="radio" name="mentee" value="no" checked > No </input>
+        {% endif %}
+    </label></p>
+
+    <p><label class = "required" >Name: <input required type="text" name="name" value = "{{student.name}}"></label></p>
+    <p><label > Hobby- please seperate by commas if multiple <textarea  type="text" name="hobby"> {{student.hobbies}}</textarea></label></p>
+    <p><label>Profile picture: <input type="file" name="pic"></label></p>
+    <p><label  >Bio: <textarea  type="text" name="bio">{{student.bio}}</textarea></label></p>
+    <p><input type="submit" name = "submit" value="Edit Profile">
+</form>
+
+
+{% endblock %}

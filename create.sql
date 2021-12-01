@@ -26,7 +26,7 @@ create table major(
    majorName varchar(20)
 )
 Engine = innoDB;
- 
+
 create table student(
    nm int auto_increment not null  primary key ,
    name varchar(20) not null,

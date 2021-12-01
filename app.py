@@ -64,54 +64,41 @@ def create():
             return render_template( "createN.html", info = globalVars.info)
         else: 
             try:
-                #process non required information
+               #process non required information
                 nm = session['uid']
-                flash(nm)
-                columns = ["race","firstGen","spiritual","personality","immigration","city","bio","career"]
-                final = []
-                #update the student table
-                for col in columns:
-                    elt = info.getlist(col)
-                    if elt == []:
-                        elt = None
-                    else:
-                        elt = ','.join(elt)
-                    final.append(elt)
-                 
-                final.append(nm)
-                curs.execute(''' update student set race = %s, firstGen = %s, spiritual = %s,
-                    personality = %s, immigration = %s, city = %s, bio = %s, career = %s where nm = %s''',final)
-                conn.commit()
-        
-                hobbies = info["hobby"].strip().lower()
-                #update the hobby tables
-                if len(hobbies) != 0:
-                    student.processHobby(curs,hobbies,conn,nm)
-
-                country = list(info.getlist("country"))
-                org =list( info.getlist("org"))
-                major = list(info.getlist("major"))
-
-                #update the country table
-                if len(country) != 0:
-                    student.processCountry(curs,country,conn,nm)
-                
-                #update the club table
-                if len(org) != 0:
-                    student.processOrg(curs,org,conn,nm)
-                #update the major table
-                if len(major) != 0:
-                    student.processMajor(curs,major,conn,nm)
-
-                #process image
-                f = request.files['pic']
-                student.processImage(f,nm,app,curs,conn)
-                #redirect to home page 
+                student.updateNonRequired(info,nm,conn,curs,app)
                 return redirect(url_for('index'))
-
             except Exception as err:
                 flash('It failed  {}'.format(err))
                 return render_template("createN.html", info = globalVars.info)
+
+
+@app.route('/edit/', methods = ['Get','POST'])
+def edit():
+    if request.method == "GET":
+        conn = dbi.connect()
+        s = student.studentInfo(conn, session["uid"])
+        for col in s:
+            if s[col] == None:
+                s[col] = []
+        s["majors"] = []
+        s["races"] = []
+        s["country"] = []
+        s["org"] = []
+        s["hobbies"] = ','.join(["test","test"])
+        print(s)
+        return render_template("edit.html", student = s, info = globalVars.info, nm = session["uid"])
+    else:
+        info = request.form.copy()
+        nm = session['uid']
+        conn = dbi.connect()
+        curs = dbi.cursor(conn)
+        student.updateNonRequired(info,nm,conn,curs,app)
+        student.updateRequired(info,nm,conn,curs)
+        return redirect(url_for('index'))
+
+
+        
 
 
 
@@ -167,7 +154,7 @@ def login():
             session['email'] = email
             return redirect(url_for('index'))
         else:
-            flash("Wrong username or password")
+            flash("Wrong password")
             return render_template("login.html")
 
         
