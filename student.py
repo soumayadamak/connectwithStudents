@@ -2,6 +2,8 @@ from werkzeug.utils import secure_filename
 import sys, os
 from flask import (Flask, render_template, make_response, url_for, request,
                    redirect, flash, session, send_from_directory, jsonify)
+
+import cs304dbi as dbi
 def processHobby(curs,hobbies,conn,nm):
     hobbies = hobbies.split(',')
     for hobby in hobbies:
@@ -60,3 +62,13 @@ def processImage(f,nm,app,curs,conn):
         f.save(pathname)
         curs.execute(''' update student set profile = %s ''',[filename])
         conn.commit()
+
+
+
+# find a single student
+def studentInfo(conn, id):
+    curs = dbi.dict_cursor(conn)
+    sql = "select * from student where nm = %s"
+    curs.execute(sql,[id])
+    info = curs.fetchone()
+    return info
