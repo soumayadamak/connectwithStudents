@@ -33,12 +33,22 @@
     $("#joinform").on('submit', function (event) {
          var pw1 = $(this).find('[name=password1]').val();
          var pw2 = $(this).find('[name=password2]').val();
+         var email = $(this).find('[name=email]').val().split("@")[1].split(".")[0];
          // should also check for length and common words etc
-         if( pw1 != pw2 ) {
-             // something more sophisticated than alert would be nice
+        if(pw1.length != pw2.length){
+
+            event.preventDefault();
+             alert("passwords don't match");
+        }  
+        else if( pw1 != pw2 ) {
+             
              event.preventDefault();
              alert("passwords don't match");
-         }else{
+         }else if( email != 'wellesley'){
+            event.preventDefault();
+            alert("not a valid wellesley email");
+         }
+         else{
              return true;
          }
     });

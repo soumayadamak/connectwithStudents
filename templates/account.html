@@ -1,8 +1,9 @@
 {% extends 'base.html' %}
 
 {% block main_content %}
-<p>{{student.name}}</p>
+<p id = "name">{{student.name}}</p>
 <p> {{student.bio}}</p>
-
-
+<form method = "get" action = "{{url_for('edit')}}">
+<button type = "submit"><i class='fas fa-edit' style='font-size:36px'></i></button>
+</form>
 {% endblock %}

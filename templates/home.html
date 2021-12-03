@@ -5,20 +5,15 @@
 
 <p>Are you looking for a peer mentor or a friend to navigate college with?</p>
 
-<!-- <div id="btnContainer">
-  <button class="btn active" onclick="filterSelection('all')"> Show all</button>
-  <button class="btn" onclick="filterSelection('name')"> Name</button>
-  <button class="btn" onclick="filterSelection('class')"> Class</button>
-  <button class="btn" onclick="filterSelection('major')"> Major</button>
-</div> -->
 
 <div class = "container">
   {% for row in students | batch(3) %}
   <div class="row">
     {% for student in row %}
+    {% set alt = "profile photo of " + student.name %}
     <div class="column">
       <div class = "card">
-        <img src = '{{student.source}}'>
+        <img src = '{{student.src}}' alt = {{alt}}>
         <div class = "container">
           <h2> {{student.name}} </h2>
           <p class = "title"> {{student.class}} </p>
