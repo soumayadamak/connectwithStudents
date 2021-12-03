@@ -26,17 +26,17 @@ create table major(
    majorName varchar(20)
 )
 Engine = innoDB;
- 
+
 create table student(
    nm int auto_increment not null  primary key ,
    name varchar(20) not null,
-   email varchar(20) not null,
+   email varchar(40) not null,
    unique(email),
    index(email),
    password char(60) not null,
    profile varchar(1024),
    mentor  varchar(3),
-   mentee bit,
+   mentee varchar(3),
    class SET("2022","2023","2024","2025") not null,
    race SET("Native American/Alaska Native", "Black/African American", "White/non Hispanic","Asian","Middle Eastern/North African","Hispanic/Latinx","Pacific Islander","Not Listed"),
    firstGen set("First Generation", "Low Income Background"),
