@@ -131,6 +131,16 @@ def updateRequired(info,nm,conn,curs):
     class = %s where nm = %s''',[info["name"],info["mentor"],info["mentee"],info["year"], nm])
     conn.commit()
 
+
+def studentInfo(conn, query):
+    ''' Input: connection to the databse and the name of the stduent that was written in the search bar
+    Output: '''
+    curs = dbi.dict_cursor(conn)
+    curs.execute(''' select nm from person where person.name LIKE %s ''', ['%' + query + '%'])
+    people = curs.fetchall()
+    return people
+   
+
 # Input: conenction and stduent id
 # Output: the information of the given student 
 def studentInfo(conn, id):

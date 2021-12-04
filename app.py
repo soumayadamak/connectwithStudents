@@ -72,9 +72,28 @@ def create():
                 flash('It failed  {}'.format(err))
                 return render_template("createN.html", info = globalVars.info)
 
+@app.route("/query/")
+def query():
+    ''' handles the submission of the search bar and finds all the students whose names 
+    match the input'''
+    query = request.args.get('query').lower()
+    conn = dbi.connect()
+    people = student.studentInfo(conn,query)
+
+    # #stopped here: was thinking of AJAX!! 
+    # if len(people) == 1:
+    #         return redirect(url_for('person', person_id_number = people[0]['nm']))
+    #     elif len(people) == 0 :
+    #         return render_template("error.html", kind = kind) 
+    #     else: 
+    #         return render_template("many_people.html", people = people, name = query)
+
+        
 
 @app.route('/edit/', methods = ['Get','POST'])
 def edit():
+    ''' If the method is get, it Populates the edit form with pre-given information of the student
+    If the method is post, it updates the data base with the new submitted informatio'''
     if request.method == "GET":
         conn = dbi.connect()
         s = student.studentInfo(conn, session["uid"])
@@ -97,11 +116,6 @@ def edit():
         student.updateRequired(info,nm,conn,curs)
         return redirect(url_for('index'))
 
-
-        
-
-
-
 #Shows the basic navigation, ie the homepage, which will display all the users in the app (will later add the filter feature)
 @app.route('/')
 def index():
@@ -119,6 +133,7 @@ def index():
         return render_template('home.html', students = students, nm = session["uid"])
     else:
         return redirect(url_for('login'))
+
 
 @app.route('/logout/')
 def logout():
@@ -147,9 +162,10 @@ def login():
         password = info["password"]
         conn = dbi.connect()
         logged, nm = student.login(conn, email, password)
+        print(logged)
         if logged:
             session['logged_in'] = True
-            session['visits'] += 1
+            session['visits'] = session.get('visits',0) + 1
             session['uid'] = nm
             session['email'] = email
             return redirect(url_for('index'))

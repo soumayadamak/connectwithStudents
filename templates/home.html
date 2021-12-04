@@ -1,6 +1,13 @@
 {% extends "base.html" %}
 
 {% block main_content %}
+<form class = "search" method="get" action="{{url_for('query')}}">
+  <p><label>Search:
+      <input required type="text" name="query" placeholder="Search for name"> </label>
+  <input type="submit" value=" search">
+  </p>
+  
+  </form>
 <h1>Heyyy</h1>
 
 <p>Are you looking for a peer mentor or a friend to navigate college with?</p>
