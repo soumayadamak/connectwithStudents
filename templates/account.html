@@ -3,7 +3,12 @@
 {% block main_content %}
 <p id = "name">{{student.name}}</p>
 <p> {{student.bio}}</p>
+<p> {{student.email}}</p>
 <form method = "get" action = "{{url_for('edit')}}">
-<button type = "submit"><i class='fas fa-edit' style='font-size:36px'></i></button>
+    <p>
+        <button type="submit" class="btn btn-default btn-sm">
+          <span class="fa fa-edit"></span> Edit
+        </button>
+      </p>
 </form>
 {% endblock %}

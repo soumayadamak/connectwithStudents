@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+
+
+    {% block main_content %}
+    <form class = "search" method="get" action="{{url_for('search')}}">
+    <p><label>Search:
+        <input required type="text" name="query" placeholder="Search for name"> </label>
+    <input type="submit" value=" search">
+    </p>
+    
+    </form>
+
+    <div class = "container">
+    {% for row in students | batch(3) %}
+        <div class="row">
+        {% for student in row %}
+        {% set alt = "profile photo of " + student.name %}
+        <div class="column">
+            <div class = "card">
+            <img src = '{{student.src}}' alt = {{alt}}>
+            <div class = "container">
+                <h2> {{student.name}} </h2>
+                <p class = "title"> {{student.class}} </p>
+                <p> {{student.bio}}</p>
+                <p> {{student.email}} </p>
+                <form method="post" action="{{url_for('view', id = student.nm)}}">
+                <p><button  type = "submit" name = "view" class="button">View</button></p>
+                </form>
+                <p><button class="button">Contact</button></p>
+            </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endfor %}
+    </div>
+
+
+    {% endblock %}
+

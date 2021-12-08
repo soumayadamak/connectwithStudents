@@ -72,21 +72,19 @@ def create():
                 flash('It failed  {}'.format(err))
                 return render_template("createN.html", info = globalVars.info)
 
-@app.route("/query/")
-def query():
+@app.route("/search/")
+def search():
     ''' handles the submission of the search bar and finds all the students whose names 
     match the input'''
     query = request.args.get('query').lower()
     conn = dbi.connect()
-    people = student.studentInfo(conn,query)
+    students = student.searchStudent(conn,query)
+    for s in students: 
+        if s.get("profile") == None:
+            s["profile"] = 'default.jpg'
+        s["src"] = url_for('findPic', profile = s.get("profile"))
+    return render_template("search.html", nm = session["uid"], students = students)
 
-    # #stopped here: was thinking of AJAX!! 
-    # if len(people) == 1:
-    #         return redirect(url_for('person', person_id_number = people[0]['nm']))
-    #     elif len(people) == 0 :
-    #         return render_template("error.html", kind = kind) 
-    #     else: 
-    #         return render_template("many_people.html", people = people, name = query)
 
         
 
@@ -114,7 +112,7 @@ def edit():
         curs = dbi.cursor(conn)
         student.updateNonRequired(info,nm,conn,curs,app)
         student.updateRequired(info,nm,conn,curs)
-        return redirect(url_for('index'))
+        return redirect(url_for('view', id = nm))
 
 #Shows the basic navigation, ie the homepage, which will display all the users in the app (will later add the filter feature)
 @app.route('/')
@@ -193,6 +191,7 @@ def view(id):
 
 @app.route("/pic/<profile>")
 def findPic(profile):
+    ''' Given the file name of the photo, the function return the file'''
     print("it got here")
     return send_from_directory(app.config['UPLOADS'],profile)
 

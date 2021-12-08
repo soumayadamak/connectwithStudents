@@ -47,7 +47,7 @@ def processOrg(curs,org,conn,nm):
     for orga in org: 
         orga = orga.split()[0]
         curs.execute(''' select clid from club where clubName LIKE %s''', [orga.strip()+'%'])
-        c = curs.fetchone()[0][0]
+        c = curs.fetchone()[0]
         curs.execute(''' insert into inClub(nm,clid) values (%s,%s)''',[nm,c])
         conn.commit()
 
@@ -132,11 +132,11 @@ def updateRequired(info,nm,conn,curs):
     conn.commit()
 
 
-def studentInfo(conn, query):
+def searchStudent(conn, query):
     ''' Input: connection to the databse and the name of the stduent that was written in the search bar
     Output: '''
     curs = dbi.dict_cursor(conn)
-    curs.execute(''' select nm from person where person.name LIKE %s ''', ['%' + query + '%'])
+    curs.execute(''' select * from student where student.name LIKE %s ''', ['%' + query + '%'])
     people = curs.fetchall()
     return people
    
