@@ -1,9 +1,23 @@
 {% extends "base.html" %}
 
 {% block main_content %}
-<h1>Heyyy</h1>
 
-<p>Are you looking for a peer mentor or a friend to navigate college with?</p>
+<h1>WConnect</h1>
+<p>College is more fun with friends!</p>
+<form method="POST" action="{{url_for('search')}}" style="text-align: left; padding-bottom: 5px;">
+  <label for="filter-label">Filter by: </label>
+  <select name="filterType" >
+      <option value="select">--select--</option>
+      <option value="all">All students</option>
+      <option value="class">Class</option>
+      <option value="major">Major</option>
+      <option value="hobbies">Hobbies</option>
+      <option value="career">Career</option>
+      <option value="mentor">Mentor</option>
+      <option value="mentee">Mentee</option>
+  </select>
+  <input type="submit" value="Apply">
+</form>
 
 
 <div class = "container">
@@ -19,7 +33,7 @@
           <p class = "title"> {{student.class}} </p>
           <p> {{student.bio}}</p>
           <p> {{student.email}} </p>
-          <form method="post" action="{{url_for('view', id = student.nm)}}">
+          <form method="get" action="{{url_for('view', id = student.nm)}}">
           <p><button  type = "submit" name = "view" class="button">View</button></p>
           </form>
           <p><button class="button">Contact</button></p>

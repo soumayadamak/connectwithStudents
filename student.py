@@ -1,3 +1,11 @@
+'''
+Project: WConnect 
+Project Description: Mentor/Mentee Database for Wellesley Students
+Authors: Adhel Geng and Soumaya Dammak
+Course: CS304 Fall 2021
+
+'''
+
 from werkzeug.utils import secure_filename
 import sys, os
 from flask import (Flask, render_template, make_response, url_for, request,
@@ -5,6 +13,8 @@ from flask import (Flask, render_template, make_response, url_for, request,
 
 import cs304dbi as dbi
 import bcrypt
+
+import globalVars
 #Input: cursor, conenciton, a string of the hobbies seperated by commas, and the user id
 # seperates the hobbies, checks if the hobbies already exist in the hobby table and adds them if not. 
 #It then adds the user the hobby to the hasHobby table
@@ -45,8 +55,8 @@ def processCountry(curs,country,conn,nm):
 # Loops through the clubs that the user selected and adds each club to the inClub table
 def processOrg(curs,org,conn,nm):
     for orga in org: 
-        orga = orga.split()[0]
-        curs.execute(''' select clid from club where clubName LIKE %s''', [orga.strip()+'%'])
+        orga = orga.split()[0].strip()
+        curs.execute(''' select clid from club where clubName LIKE %s''', ['%'+ orga+'%'])
         c = curs.fetchone()[0][0]
         curs.execute(''' insert into inClub(nm,clid) values (%s,%s)''',[nm,c])
         conn.commit()
@@ -131,16 +141,115 @@ def updateRequired(info,nm,conn,curs):
     class = %s where nm = %s''',[info["name"],info["mentor"],info["mentee"],info["year"], nm])
     conn.commit()
 
-# Input: conenction and stduent id
+# Input: connection and student id
 # Output: the information of the given student 
 def studentInfo(conn, id):
     curs = dbi.dict_cursor(conn)
     sql = "select * from student where nm = %s"
     curs.execute(sql,[id])
     info = curs.fetchone()
-    #add information collected from other tables here in the form of list 
+    # #major info
+    sqlMajor = "select majorName from major inner join hasMajor using (mid) where nm = %s"
+    curs.execute(sqlMajor,[id])
+    vals = curs.fetchall()
+    info["majors"] = [v["majorName"]for v in vals]
+    # #race info
+    sqlRace = "select * from student where race = %s"
+    curs.execute(sqlRace,[id])
+    vals = curs.fetchall()
+    info["races"] = [v["race"]for v in vals]
+    # #country info
+    sqlCountry = "select name from country inner join fromCountry using (cid) where nm = %s"
+    curs.execute(sqlCountry,[id])
+    vals = curs.fetchall()
+    info["country"] = [v["name"]for v in vals]
+    # #org info
+    sqlOrg = "select clubName from club inner join inClub using (clid) where nm = %s"
+    curs.execute(sqlOrg,[id])
+    vals = curs.fetchall()
+    info["org"] = [v["clubName"]for v in vals]
+    # #hobbies info
+    sqlHobby = "select name from hobby inner join hasHobby where nm = %s"
+    curs.execute(sqlHobby,[id])
+    vals = curs.fetchall()
+    info["hobbies"] = [v["name"]for v in vals]
+    #careers info
+    sqlCareer = "select career from student where nm = %s"
+    curs.execute(sqlCareer,[id])
+    vals = curs.fetchall()
+    info["careers"] = [v["career"]for v in vals]
     return info
 
+#Find all students
+def allStudents(conn):
+    """Returns the names of all students"""
+    sql = "select * from student" 
+    curs = dbi.dict_cursor(conn)
+    curs.execute(sql)
+    info = curs.fetchall()
+    return info
+
+#Filter students based on hobby
+def filterByHobby(conn, hb):
+    '''
+    Returns the names and hobbies of people of the specified hobby
+    '''
+    curs = dbi.dict_cursor(conn)
+    curs.execute('''
+        select name from student inner join hasHobby using (nm) 
+        where hb=%s''',[hb])
+    return curs.fetchall()
+
+#Filter students based on major
+def filterByMajor(conn, mid):
+    '''
+    Returns the names of people of the specified major
+    '''
+    curs = dbi.dict_cursor(conn)
+    curs.execute('''
+        select name from student inner join hasMajor using (nm) 
+        where mid=%s''',[mid])
+    return curs.fetchall()
+
+#Filter students based on class year
+def filterByClass(conn):
+    '''
+    Returns the names of people of the specified class year
+    '''
+    curs = dbi.dict_cursor(conn)
+    curs.execute('''
+        select * from student where class=%s''')
+    return curs.fetchall()
+
+#Filter students based on whether or not one is a mentor
+def filterByMentor(conn):
+    '''
+    Returns the names of people of who specified they were mentors
+    '''
+    curs = dbi.dict_cursor(conn)
+    curs.execute('''
+        select * from student where mentor=%s''')
+    return curs.fetchall()
+
+#Filter students based on whether or not one is a mentee
+def filterByMentee(conn):
+    '''
+    Returns the names of people of who specified they were mentors
+    '''
+    curs = dbi.dict_cursor(conn)
+    curs.execute('''
+        select * from student where mentee=%s''')
+    return curs.fetchall()
+
+#Filter based on career interests
+def filterByCareer(conn):
+    '''
+    Returns the names of people of the specified career
+    '''
+    curs = dbi.dict_cursor(conn)
+    curs.execute('''
+        select * from student where career=%s''')
+    return curs.fetchall()
 
 def login(conn, email, password):
     '''tries to log the user in given email & password. Returns True if

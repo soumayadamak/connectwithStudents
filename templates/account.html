@@ -1,8 +1,16 @@
 {% extends 'base.html' %}
 
 {% block main_content %}
-<p id = "name">{{student.name}}</p>
-<p> {{student.bio}}</p>
+<div class = "card">
+  <img src = '{{student.src}}' alt = {{alt}}>
+  <p id = "name">{{student.name}}</p>
+  <p id="major">{{student.major}}</p>
+  <p id="race">{{student.race}}</p>
+  <p id="country">{{student.country}}</p>
+  <p id="org">{{student.org}}</p>
+  <p id="hobbies">{{student.hobbies}}</p>
+  <p>{{student.bio}}</p>
+  </div>
 <form method = "get" action = "{{url_for('edit')}}">
 <button type = "submit"><i class='fas fa-edit' style='font-size:36px'></i></button>
 </form>

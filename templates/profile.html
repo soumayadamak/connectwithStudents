@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block main_content %}
+<div class = "card">
+<img src = '{{student.src}}' alt = {{alt}}>
+<p id="name">{{student.name}}</p>
+<p id="major">{{student.major}}</p>
+<p id="race">{{student.race}}</p>
+<p id="country">{{student.country}}</p>
+<p id="country">{{student.org}}</p>
+<p id="hobbies">{{student.hobbies}}</p>
+<p> {{student.bio}}</p>
+</div>
+{% endblock %}

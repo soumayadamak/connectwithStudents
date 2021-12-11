@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block head_stuff %} 
+    <title>Filter</title>
+    <meta name="description" content="Displays all students and allows filtering">
+{% endblock %}
+
+{% block nav %}
+{% include "home.html" %}
+{% endblock %}
+
+{% block top %}
+    <h1 class="topHeader">Students</h1>
+{% endblock %}
+
+{% block main %}
+<form method="POST" action="{{url_for('search')}}" style="text-align: center; padding-bottom: 5px;">
+    <label for="filter-label">Filter by: </label>
+    <select name="filter-type" >
+        <option value="select">--select--</option>
+        <option value="all">All students</option>
+        <option value="class">Class</option>
+        <option value="major">Major</option>
+        <option value="hobbies">Hobbies</option>
+        <option value="career">Career</option>
+        <option value="mentor">Mentor</option>
+        <option value="mentee">Mentee</option>
+    </select>
+    <input type="submit" value="Apply">
+</form>
+<table id="majorTable">
+    <tr>
+        <th class="majorHead"><strong>mid</strong></th>
+        <th class="weaponHead"><strong>majorName</strong></th>
+    </tr>
+
+    {% for name in allMajorsList: %}
+    <tr wid={{major.mid}}>
+        <td class="weaponData">{{ major.mid }}</td>
+        <td class="weaponData">{{ major.majorName }}</td>
+    </tr>
+    {% endfor %}
+
+</table>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+{% endblock %}

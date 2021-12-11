@@ -1,4 +1,4 @@
-use sdammak_db ;
+use ageng_db ;
 drop table if exists hasHobby;
 drop table if exists fromCountry;
 drop table if exists inClub;
@@ -11,7 +11,7 @@ drop table if exists major;
  
 create table country(
    cid int auto_increment not null  primary key,
-   name varchar(20)
+   name varchar(50)
 )
 ENGINE = innoDB;
 

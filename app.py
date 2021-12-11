@@ -1,3 +1,11 @@
+'''
+Project: WConnect 
+Project Description: Mentor/Mentee Database for Wellesley Students
+Authors: Adhel Geng and Soumaya Dammak
+Course: CS304 Fall 2021
+
+'''
+
 from flask import (Flask, render_template, make_response, url_for, request,
                    redirect, flash, session, send_from_directory, jsonify)
 from werkzeug.utils import secure_filename
@@ -63,14 +71,14 @@ def create():
             session['visits'] = 1
             return render_template( "createN.html", info = globalVars.info)
         else: 
-            try:
+            # try:
                #process non required information
-                nm = session['uid']
-                student.updateNonRequired(info,nm,conn,curs,app)
-                return redirect(url_for('index'))
-            except Exception as err:
-                flash('It failed  {}'.format(err))
-                return render_template("createN.html", info = globalVars.info)
+            nm = session['uid']
+            student.updateNonRequired(info,nm,conn,curs,app)
+            return redirect(url_for('index'))
+            # except Exception as err:
+            #     flash('It failed  {}'.format(err))
+            #     return render_template("createN.html", info = globalVars.info)
 
 
 @app.route('/edit/', methods = ['Get','POST'])
@@ -81,6 +89,7 @@ def edit():
         for col in s:
             if s[col] == None:
                 s[col] = []
+
         s["majors"] = []
         s["races"] = []
         s["country"] = []
@@ -151,9 +160,7 @@ def login():
         else:
             flash("Wrong password")
             return render_template("login.html")
-
-        
-            
+              
 #main page 
 @app.route('/findamentor/')
 def findMentor():
@@ -161,26 +168,61 @@ def findMentor():
     """Main interaction page where mentors/mentees find each other"""
     return render_template("findMentor.html", nm = session["uid"])
 
+#profile page 
+#Shows the individual account page
+@app.route('/profile/<id>',methods=['GET','POST'])
+def account(id):
+    """Shows user profile page"""
+    conn = dbi.connect()
+    user = student.studentInfo(conn,id)
+    return render_template('account.html', student = user, nm = session["uid"])
 
 #Shows the student profile when the "view" button is clicked
-@app.route('/profile/<id>', methods=['GET','POST'])
+#shows wrong name -- should show student profile not user profile
+@app.route('/profile/<id>', methods=['GET'])
 def view(id):
+    #if user clicks "view" button and the account is not theirs, send them to profile page
     conn = dbi.connect()
-    user = student.studentInfo(conn, id)
-    return render_template("account.html", nm = session["uid"], student = user)
-
-
+    user = student.studentInfo(conn,id)
+    return render_template("profile.html")
+    
+    
+#Uploads profile pic
 @app.route("/pic/<profile>")
 def findPic(profile):
     print("it got here")
     return send_from_directory(app.config['UPLOADS'],profile)
+
+#On GET shows a menu of students matching that criteria
+#Reset filter button to allow user to filter again
+@app.route('/search/', methods=['GET','POST']) 
+def search():
+    conn = dbi.connect()
+    print(request.form.get("filter-label"))
+    filterType = request.form.get("filter-label")
+    filteredStudentList = []
+    if request.method == 'GET':
+        allStudentList = student.allStudents(conn)
+        return render_template('home.html', allStudentList = allStudentList)
+    if filterType == "select" or filterType == "all":
+        filteredStudentList =student.allStudents(conn)
+    if filterType == "class":
+        filteredStudentList = student.filterByClass(conn)
+    if filterType == "major":
+        filteredStudentList = student.filterByMajor(conn)
+    if filterType == "hobbies":
+        filteredStudentList = student.filterByHobby(conn)
+    if filterType == "career":
+        filteredStudentList = student.filterByCareer(conn)
+    return render_template('home.html', allStudentList = filteredStudentList)
+
 
 
 @app.before_first_request
 def init_db():
     dbi.cache_cnf()
     # set this local variable to 'wmdb' or your personal or team db
-    db_to_use = 'sdammak_db' 
+    db_to_use = 'ageng_db' 
     dbi.use(db_to_use)
     print('will connect to {}'.format(db_to_use))
 
